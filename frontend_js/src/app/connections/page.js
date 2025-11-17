@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Ca
 import { Badge } from '../../components/ui/Badge';
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
 import connectionService from '../../lib/connectionService';
+import WarmIntroRequestModal from '../../components/warm-intro/WarmIntroRequestModal';
 import { toast } from 'sonner';
 import { 
   Users, 
@@ -20,7 +21,8 @@ import {
   MapPin,
   Clock,
   Check,
-  X as XIcon
+  X as XIcon,
+  Sparkles
 } from 'lucide-react';
 import Image from 'next/image';
 
@@ -32,6 +34,7 @@ function ConnectionsContent() {
   const [sentRequests, setSentRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, action: null, id: null, title: '', message: '' });
+  const [warmIntroTarget, setWarmIntroTarget] = useState(null);
 
   // Enable scroll
   useEffect(() => {
@@ -273,6 +276,15 @@ function ConnectionsContent() {
                   <Button
                     size="sm"
                     variant="outline"
+                    onClick={() => setWarmIntroTarget(person)}
+                    className="hidden sm:inline-flex px-3 py-1.5 text-xs sm:text-sm border-orange-300 text-orange-700 hover:bg-orange-50"
+                  >
+                    <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                    Warm Intro
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
                     onClick={() => handleRemove(connection.connection_id)}
                     className="text-red-600 hover:bg-red-50 border-red-300 px-3 py-1.5 text-xs sm:text-sm"
                   >
@@ -429,6 +441,13 @@ function ConnectionsContent() {
         confirmText="Yes, proceed"
         cancelText="Cancel"
         confirmVariant="warning"
+      />
+
+      <WarmIntroRequestModal
+        isOpen={!!warmIntroTarget}
+        onClose={() => setWarmIntroTarget(null)}
+        requester={user}
+        targetUser={warmIntroTarget}
       />
     </Navigation>
   );
