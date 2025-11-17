@@ -167,17 +167,19 @@ export default function ChatWindow({ conversation, currentUser, onBack, onDelete
             <ArrowLeft className="h-5 w-5" />
           </Button>
           
-          {otherUser?.avatar_url ? (
-            <img
-              src={otherUser.avatar_url}
-              alt={otherUser.name}
-              className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover ring-2 ring-blue-100 flex-shrink-0"
-            />
-          ) : (
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold ring-2 ring-blue-100 flex-shrink-0">
-              <span className="text-sm">{otherUser?.name?.[0]?.toUpperCase() || '?'}</span>
-            </div>
-          )}
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold ring-2 ring-blue-100 flex-shrink-0 overflow-hidden">
+            {otherUser?.avatar_url && (
+              <img
+                src={otherUser.avatar_url}
+                alt={otherUser.name}
+                className="w-full h-full rounded-full object-cover"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                }}
+              />
+            )}
+            <span className="text-sm">{otherUser?.name?.[0]?.toUpperCase() || '?'}</span>
+          </div>
           
           <div className="min-w-0 flex-1">
             <h3 className="font-semibold text-sm sm:text-base text-gray-900 truncate">{otherUser?.name || 'Unknown'}</h3>
@@ -298,17 +300,19 @@ export default function ChatWindow({ conversation, currentUser, onBack, onDelete
               >
                 <div className={`flex gap-2 max-w-[70%] ${isOwn ? 'flex-row-reverse' : 'flex-row'}`}>
                   {!isOwn && (
-                    message.sender?.avatar_url ? (
-                      <img
-                        src={message.sender.avatar_url}
-                        alt={message.sender.name}
-                        className="w-8 h-8 rounded-full object-cover flex-shrink-0"
-                      />
-                    ) : (
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
-                        {message.sender?.name?.[0]?.toUpperCase() || '?'}
-                      </div>
-                    )
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-semibold flex-shrink-0 overflow-hidden">
+                      {message.sender?.avatar_url && (
+                        <img
+                          src={message.sender.avatar_url}
+                          alt={message.sender.name}
+                          className="w-full h-full rounded-full object-cover"
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                          }}
+                        />
+                      )}
+                      {message.sender?.name?.[0]?.toUpperCase() || '?'}
+                    </div>
                   )}
                   
                   <div>

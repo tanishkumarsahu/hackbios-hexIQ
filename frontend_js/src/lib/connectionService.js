@@ -226,11 +226,19 @@ class ConnectionService {
       // OPTIMIZATION: Fetch ALL users in ONE query instead of N queries
       const { data: users } = await supabase
         .from('users')
-        .select('id, name, email, avatar_url, current_title, current_company, location')
+        .select('id, name, email, avatar_url, profile_pic, current_title, current_company, location')
         .in('id', userIds);
 
-      // Create user map for O(1) lookup
-      const userMap = Object.fromEntries(users?.map(u => [u.id, u]) || []);
+      // Create user map for O(1) lookup with normalized avatar_url
+      const userMap = Object.fromEntries(
+        (users || []).map(u => [
+          u.id,
+          {
+            ...u,
+            avatar_url: u.avatar_url || u.profile_pic || null
+          }
+        ])
+      );
 
       // Map connections with user data
       const connections = data.map(conn => {
@@ -272,10 +280,18 @@ class ConnectionService {
       const requesterIds = data.map(req => req.requester_id);
       const { data: users } = await supabase
         .from('users')
-        .select('id, name, email, avatar_url, current_title, current_company, location')
+        .select('id, name, email, avatar_url, profile_pic, current_title, current_company, location')
         .in('id', requesterIds);
 
-      const userMap = Object.fromEntries(users?.map(u => [u.id, u]) || []);
+      const userMap = Object.fromEntries(
+        (users || []).map(u => [
+          u.id,
+          {
+            ...u,
+            avatar_url: u.avatar_url || u.profile_pic || null
+          }
+        ])
+      );
 
       const requests = data.map(req => ({
         ...req,
@@ -310,10 +326,18 @@ class ConnectionService {
       const recipientIds = data.map(req => req.recipient_id);
       const { data: users } = await supabase
         .from('users')
-        .select('id, name, email, avatar_url, current_title, current_company, location')
+        .select('id, name, email, avatar_url, profile_pic, current_title, current_company, location')
         .in('id', recipientIds);
 
-      const userMap = Object.fromEntries(users?.map(u => [u.id, u]) || []);
+      const userMap = Object.fromEntries(
+        (users || []).map(u => [
+          u.id,
+          {
+            ...u,
+            avatar_url: u.avatar_url || u.profile_pic || null
+          }
+        ])
+      );
 
       const requests = data.map(req => ({
         ...req,

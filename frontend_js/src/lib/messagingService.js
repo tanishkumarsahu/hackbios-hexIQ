@@ -71,10 +71,18 @@ class MessagingService {
       // Fetch all participants in one query
       const { data: users } = await supabase
         .from('users')
-        .select('id, name, email, avatar_url, current_title, current_company')
+        .select('id, name, email, avatar_url, profile_pic, current_title, current_company')
         .in('id', allParticipantIds);
 
-      const userMap = Object.fromEntries(users?.map(u => [u.id, u]) || []);
+      const userMap = Object.fromEntries(
+        (users || []).map(u => [
+          u.id,
+          {
+            ...u,
+            avatar_url: u.avatar_url || u.profile_pic || null
+          }
+        ])
+      );
 
       // Get last message for each conversation
       const conversationsWithDetails = await Promise.all(

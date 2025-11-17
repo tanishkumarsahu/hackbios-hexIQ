@@ -186,16 +186,18 @@ function ConnectionsContent() {
         <CardContent className="p-3 sm:p-4 lg:p-5">
           <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
             {/* Avatar */}
-            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-base sm:text-lg flex-shrink-0 shadow-md">
-              {person?.avatar_url ? (
+            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-base sm:text-lg flex-shrink-0 shadow-md overflow-hidden">
+              {person?.avatar_url && (
                 <img 
                   src={person.avatar_url} 
                   alt={person.name}
                   className="w-full h-full rounded-full object-cover"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                  }}
                 />
-              ) : (
-                person.name?.charAt(0) || 'U'
               )}
+              {person.name?.charAt(0) || 'U'}
             </div>
 
             {/* Info */}

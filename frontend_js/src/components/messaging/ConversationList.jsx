@@ -75,17 +75,21 @@ export default function ConversationList({ conversations, selectedId, onSelect, 
             <div className="flex gap-3 items-start">
               {/* Avatar */}
               <div className="relative flex-shrink-0">
-                {otherUser?.avatar_url ? (
-                  <img
-                    src={otherUser.avatar_url}
-                    alt={otherUser.name}
-                    className="w-11 h-11 sm:w-12 sm:h-12 rounded-full object-cover ring-2 ring-white shadow-sm"
-                  />
-                ) : (
-                  <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold shadow-sm ring-2 ring-white">
-                    <span className="text-sm sm:text-base">{otherUser?.name?.[0]?.toUpperCase() || '?'}</span>
-                  </div>
-                )}
+                <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold shadow-sm ring-2 ring-white overflow-hidden">
+                  {otherUser?.avatar_url && (
+                    <img
+                      src={otherUser.avatar_url}
+                      alt={otherUser.name}
+                      className="w-full h-full rounded-full object-cover"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                      }}
+                    />
+                  )}
+                  <span className="text-sm sm:text-base">
+                    {otherUser?.name?.[0]?.toUpperCase() || '?'}
+                  </span>
+                </div>
                 {hasUnread && (
                   <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-blue-600 rounded-full border-2 border-white"></div>
                 )}
