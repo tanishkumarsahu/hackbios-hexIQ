@@ -14,7 +14,7 @@ import { toast } from 'sonner';
  * Tablet: 640px+ - Two-column grid
  * Desktop: 1024px+ - Three-column grid
  */
-export default function EventCard({ event }) {
+export default function EventCard({ event, variant = 'default' }) {
   const { user } = useAuth();
   const [isRegistered, setIsRegistered] = useState(false);
   const [registering, setRegistering] = useState(false);
@@ -36,6 +36,8 @@ export default function EventCard({ event }) {
     maxAttendees,
     createdBy
   } = event;
+
+  const isFeaturedVariant = variant === 'featured';
 
   // Check registration status
   useEffect(() => {
@@ -237,16 +239,28 @@ export default function EventCard({ event }) {
             <Button
               onClick={handleRegister}
               disabled={registering || (maxAttendees && registrationCount >= maxAttendees)}
-              className="w-full sm:flex-1 h-9 sm:h-10 text-xs sm:text-sm bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-md hover:shadow-lg transition-all duration-200"
+              className={`w-full sm:flex-1 h-9 sm:h-10 text-xs sm:text-sm text-white shadow-md hover:shadow-lg transition-all duration-200 ${
+                isFeaturedVariant
+                  ? 'bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700'
+                  : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800'
+              }`}
             >
-              {registering ? 'Registering...' : (maxAttendees && registrationCount >= maxAttendees) ? 'Event Full' : 'Register Now'}
+              {registering
+                ? 'Registering...'
+                : (maxAttendees && registrationCount >= maxAttendees)
+                  ? 'Event Full'
+                  : 'Register Now'}
             </Button>
           )}
           
           {isVirtual && virtualLink && (
             <Button
               variant="outline"
-              className="w-full sm:w-auto h-9 sm:h-10 text-xs sm:text-sm hover:bg-blue-50 hover:border-blue-300 shadow-sm hover:shadow-md transition-all duration-200"
+              className={`w-full sm:w-auto h-9 sm:h-10 text-xs sm:text-sm shadow-sm hover:shadow-md transition-all duration-200 ${
+                isFeaturedVariant
+                  ? 'hover:bg-orange-50 hover:border-orange-300 text-orange-700'
+                  : 'hover:bg-blue-50 hover:border-blue-300'
+              }`}
               onClick={() => window.open(virtualLink, '_blank')}
             >
               <ExternalLink className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5" />

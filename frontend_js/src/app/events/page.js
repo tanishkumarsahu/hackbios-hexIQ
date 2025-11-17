@@ -75,6 +75,40 @@ function EventsContent() {
     );
   });
 
+  // Derive Featured and Happening Soon sections purely on frontend rules
+  const now = new Date();
+  const threeDaysFromNow = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
+  const sevenDaysFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+  const parseEventDate = (event) => {
+    try {
+      return new Date(event.startDate || event.start_date || event.startDateFormatted);
+    } catch {
+      return null;
+    }
+  };
+
+  const withDates = filteredEvents.map(e => ({
+    ...e,
+    _start: parseEventDate(e)
+  })).filter(e => e._start instanceof Date && !isNaN(e._start));
+
+  // Featured: upcoming in next 7 days or high-value types, sorted by start date
+  const featuredEvents = withDates
+    .filter(e => e._start >= now && e._start <= sevenDaysFromNow)
+    .sort((a, b) => a._start - b._start)
+    .slice(0, 3);
+
+  // Happening Soon: next 3 days excluding already featured
+  const featuredIds = new Set(featuredEvents.map(e => e.id));
+  const happeningSoonEvents = withDates
+    .filter(e => !featuredIds.has(e.id) && e._start >= now && e._start <= threeDaysFromNow)
+    .sort((a, b) => a._start - b._start)
+    .slice(0, 6);
+
+  // Remaining events for main grid
+  const otherEvents = filteredEvents.filter(e => !featuredIds.has(e.id) && !happeningSoonEvents.some(h => h.id === e.id));
+
   // Handle registration
   const handleRegister = async (eventId) => {
     if (!user) {
@@ -118,7 +152,9 @@ function EventsContent() {
                     <span>Events</span>
                   </h1>
                   <p className="text-xs sm:text-sm text-gray-700 mt-1">
-                    {loading ? 'Loading...' : `${filteredEvents.length} upcoming events`}
+                    {loading
+                      ? 'Loading...'
+                      : `${filteredEvents.length} upcoming events • ${featuredEvents.length || 0} featured`}
                   </p>
                 </div>
               </div>
@@ -283,20 +319,100 @@ function EventsContent() {
               )}
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
-              {filteredEvents.map((event, index) => (
-                <div 
-                  key={event.id} 
-                  data-aos="zoom-out" 
-                  data-aos-delay={index < 6 ? index * 30 : 50 + (index * 30)}
-                >
-                  <EventCard
-                    event={event}
-                    onRegister={handleRegister}
-                    isRegistered={registeredEvents.has(event.id)}
-                  />
-                </div>
-              ))}
+            <div className="space-y-8 sm:space-y-10">
+              {/* Featured Events */}
+              {featuredEvents.length > 0 && (
+                <section>
+                  <div className="flex items-center justify-between mb-3 sm:mb-4">
+                    <h2 className="text-base sm:text-lg font-semibold text-gray-900 flex items-center gap-2">
+                      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-orange-50 text-orange-700 text-xs font-bold border border-orange-100">★</span>
+                      Featured events
+                    </h2>
+                    <p className="text-xs sm:text-sm text-gray-500">Curated highlights for this week</p>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 lg:gap-6">
+                    {featuredEvents.map((event, index) => (
+                      <div
+                        key={event.id}
+                        data-aos="zoom-out"
+                        data-aos-delay={index < 3 ? index * 40 : 80}
+                        className="relative rounded-2xl border border-orange-100 bg-white shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+                      >
+                        <div className="absolute top-0 left-0 right-0 h-1 rounded-t-2xl bg-orange-500/80" />
+                        <div className="absolute top-3 right-4 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-orange-50 text-[10px] font-medium text-orange-700 border border-orange-100">
+                          <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />
+                          <span>Featured</span>
+                        </div>
+                        <EventCard
+                          event={event}
+                          variant="featured"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {/* Happening Soon */}
+              {happeningSoonEvents.length > 0 && (
+                <section>
+                  <div className="flex items-center justify-between mb-3 sm:mb-4">
+                    <h2 className="text-base sm:text-lg font-semibold text-gray-900 flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-orange-500" />
+                      Happening soon
+                    </h2>
+                    <p className="text-xs sm:text-sm text-gray-500">Within the next 3 days</p>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
+                    {happeningSoonEvents.map((event, index) => (
+                      <div
+                        key={event.id}
+                        data-aos="zoom-out"
+                        data-aos-delay={index < 6 ? index * 30 : 40}
+                        className="relative rounded-2xl border border-orange-100 bg-orange-50/40 shadow-sm hover:shadow-md transition-shadow duration-200"
+                      >
+                        <div className="absolute top-2 left-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/80 border border-orange-100 text-[10px] font-medium text-orange-700">
+                          <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />
+                          <span>Soon</span>
+                        </div>
+                        <EventCard
+                          event={event}
+                          onRegister={handleRegister}
+                          isRegistered={registeredEvents.has(event.id)}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {/* All Events */}
+              {otherEvents.length > 0 && (
+                <section>
+                  <div className="flex items-center justify-between mb-3 sm:mb-4">
+                    <h2 className="text-base sm:text-lg font-semibold text-gray-900 flex items-center gap-2">
+                      <Building2 className="w-4 h-4 text-gray-700" />
+                      All upcoming events
+                    </h2>
+                    <p className="text-xs sm:text-sm text-gray-500">Based on your filters and search</p>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
+                    {otherEvents.map((event, index) => (
+                      <div
+                        key={event.id}
+                        data-aos="zoom-out"
+                        data-aos-delay={index < 9 ? index * 20 : 40}
+                      >
+                        <EventCard
+                          event={event}
+                          onRegister={handleRegister}
+                          isRegistered={registeredEvents.has(event.id)}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
             </div>
           )}
       </div>
