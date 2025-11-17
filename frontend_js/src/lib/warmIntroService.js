@@ -24,7 +24,7 @@ class WarmIntroService {
       .from('warm_intro_requests')
       .select(`
         *,
-        requester:requester_id(id, name, avatar_url, current_title, current_company, graduation_year, branch),
+        requester:requester_id(id, name, avatar_url, current_title, current_company, graduation_year),
         alumni:alumni_id(id, name, avatar_url)
       `)
       .eq('alumni_id', alumniId)
@@ -40,7 +40,7 @@ class WarmIntroService {
       .select(`
         *,
         requester:requester_id(id, name, avatar_url),
-        alumni:alumni_id(id, name, avatar_url, current_title, current_company)
+        alumni:alumni_id(id, name, avatar_url, current_title, current_company, graduation_year)
       `)
       .eq('requester_id', requesterId)
       .order('created_at', { ascending: false });
