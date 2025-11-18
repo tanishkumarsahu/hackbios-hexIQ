@@ -207,7 +207,7 @@ export default function EventCard({ event, variant = 'default' }) {
         )}
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-2 flex-shrink-0 mt-auto">
+        <div className="flex flex-col sm:flex-row gap-2 flex-shrink-0 mt-auto w-full">
           {checkingStatus ? (
             <Button
               variant="outline"
@@ -256,7 +256,7 @@ export default function EventCard({ event, variant = 'default' }) {
           {isVirtual && virtualLink && (
             <Button
               variant="outline"
-              className={`w-full sm:w-auto h-9 sm:h-10 text-xs sm:text-sm shadow-sm hover:shadow-md transition-all duration-200 ${
+              className={`w-full sm:w-auto h-9 sm:h-10 text-xs sm:text-sm shadow-sm hover:shadow-md transition-all duration-200 whitespace-nowrap ${
                 isFeaturedVariant
                   ? 'hover:bg-orange-50 hover:border-orange-300 text-orange-700'
                   : 'hover:bg-blue-50 hover:border-blue-300'

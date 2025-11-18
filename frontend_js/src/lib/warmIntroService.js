@@ -28,6 +28,7 @@ class WarmIntroService {
         alumni:alumni_id(id, name, avatar_url)
       `)
       .eq('alumni_id', alumniId)
+      .eq('status', 'pending')
       .order('created_at', { ascending: false });
 
     if (error) throw error;

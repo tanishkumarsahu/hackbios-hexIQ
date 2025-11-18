@@ -93,11 +93,10 @@ function EventsContent() {
     _start: parseEventDate(e)
   })).filter(e => e._start instanceof Date && !isNaN(e._start));
 
-  // Featured: upcoming in next 7 days or high-value types, sorted by start date
+  // Featured: upcoming in next 7 days, sorted by start date
   const featuredEvents = withDates
     .filter(e => e._start >= now && e._start <= sevenDaysFromNow)
-    .sort((a, b) => a._start - b._start)
-    .slice(0, 3);
+    .sort((a, b) => a._start - b._start);
 
   // Happening Soon: next 3 days excluding already featured
   const featuredIds = new Set(featuredEvents.map(e => e.id));
@@ -320,36 +319,60 @@ function EventsContent() {
             </div>
           ) : (
             <div className="space-y-8 sm:space-y-10">
-              {/* Featured Events */}
+              {/* Featured Spotlight: Hero + horizontal scroll carousel */}
               {featuredEvents.length > 0 && (
                 <section>
                   <div className="flex items-center justify-between mb-3 sm:mb-4">
                     <h2 className="text-base sm:text-lg font-semibold text-gray-900 flex items-center gap-2">
                       <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-orange-50 text-orange-700 text-xs font-bold border border-orange-100">★</span>
-                      Featured events
+                      Featured spotlight
                     </h2>
-                    <p className="text-xs sm:text-sm text-gray-500">Curated highlights for this week</p>
+                    <p className="text-xs sm:text-sm text-gray-500">Highlighted events for this week</p>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 lg:gap-6">
-                    {featuredEvents.map((event, index) => (
-                      <div
-                        key={event.id}
-                        data-aos="zoom-out"
-                        data-aos-delay={index < 3 ? index * 40 : 80}
-                        className="relative rounded-2xl border border-orange-100 bg-white shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
-                      >
-                        <div className="absolute top-0 left-0 right-0 h-1 rounded-t-2xl bg-orange-500/80" />
-                        <div className="absolute top-3 right-4 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-orange-50 text-[10px] font-medium text-orange-700 border border-orange-100">
-                          <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />
-                          <span>Featured</span>
-                        </div>
-                        <EventCard
-                          event={event}
-                          variant="featured"
-                        />
+
+                  {/* Hero featured event */}
+                  <div
+                    data-aos="zoom-out"
+                    data-aos-delay="0"
+                    className="relative mb-4 sm:mb-5 lg:mb-6 rounded-2xl border border-orange-100 bg-gradient-to-r from-orange-50/70 via-white to-white shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
+                  >
+                    <div className="absolute top-0 left-0 right-0 h-1 rounded-t-2xl bg-gradient-to-r from-orange-500 via-orange-400 to-orange-500" />
+                    <div className="absolute top-3 right-4 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-orange-50 text-[10px] font-medium text-orange-700 border border-orange-100">
+                      <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse" />
+                      <span>Spotlight</span>
+                    </div>
+                    <EventCard
+                      event={featuredEvents[0]}
+                      variant="featured"
+                    />
+                  </div>
+
+                  {/* Horizontal scroll for remaining featured */}
+                  {featuredEvents.length > 1 && (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs sm:text-sm font-medium text-gray-800">More featured events</p>
+                        <p className="text-[11px] text-gray-500 hidden sm:block">Swipe to explore</p>
                       </div>
-                    ))}
-                  </div>
+                      <div className="overflow-x-auto -mx-1 sm:-mx-2 pb-1 scrollbar-hide">
+                        <div className="flex gap-3 sm:gap-4 px-1 sm:px-2">
+                          {featuredEvents.slice(1).map((event, index) => (
+                            <div
+                              key={event.id}
+                              data-aos="zoom-out"
+                              data-aos-delay={(index + 1) * 40}
+                              className="min-w-[260px] max-w-[280px] sm:min-w-[280px] sm:max-w-[300px] flex-shrink-0 rounded-2xl border border-orange-100 bg-white shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+                            >
+                              <EventCard
+                                event={event}
+                                variant="featured"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </section>
               )}
 
