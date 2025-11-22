@@ -14,7 +14,7 @@
 
 **A comprehensive alumni networking platform that bridges the gap between students and alumni through real-time connections, career opportunities, and community engagement.**
 
-🚀 **Live Demo:** [alumnode.vercel.app](https://alumnode.vercel.app)
+🚀 **Live Link:** [alumnode.vercel.app](https://alumnode.vercel.app)
 
 </div>
 
